@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const getWorkouts = async (request, response) => {
     const workout = await Workout.find({}).sort({createdAt: -1})
 
-    response.status(200).json(workout)
+    response.status(200).json(workout) 
 }
 
 // get a single workout
@@ -38,11 +38,46 @@ const createWorkout = async (request, response) => {
     }
 }
 // delete a workout
+const deleteWorkout = async (request, response) => {
+    const {id} = request.params
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return response.status(404).json({error: "No such workout"})
+    }
+
+    const workout = await Workout.findOneAndDelete({_id: id})
+
+    if (!workout) {
+        return response.status(404).json({error: "No such workout"})
+    }
+
+    return response.status(200).json(workout)
+
+}
 // update a workout
+const updateWorkout = async (request, response) => {
+    const {id} = request.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return response.status(404).json({error: "No such workout"})
+    }
+
+    const workout = await Workout.findOneAndUpdate({_id: id}, {
+        ...request.body
+    })
+
+    if (!workout) {
+        return response.status(404).json({error: "No such workout"})
+    }
+
+    response.status(200).json(workout)
+}
+
 
 module.exports = {
     createWorkout,
     getWorkouts,
-    getWorkout
+    getWorkout,
+    deleteWorkout,
+    updateWorkout
 } 
